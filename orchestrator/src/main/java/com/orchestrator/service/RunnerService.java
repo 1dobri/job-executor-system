@@ -3,6 +3,8 @@ package com.orchestrator.service;
 import com.orchestrator.domain.Runner;
 import com.orchestrator.repository.RunnerRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class RunnerService {
 
@@ -25,6 +28,7 @@ public class RunnerService {
                 .map(r -> {
                     r.setLastHeartbeat(Instant.now());
                     r.setStatus("ACTIVE");
+                    log.info("refresh runner {}", name);
                     return r;
                 })
                 .orElseGet(() -> {
@@ -32,6 +36,7 @@ public class RunnerService {
                     r.setName(name);
                     r.setLastHeartbeat(Instant.now());
                     r.setStatus("ACTIVE");
+                    log.info("Registering new runner", name);
                     return runnerRepo.save(r);
                 });
     }

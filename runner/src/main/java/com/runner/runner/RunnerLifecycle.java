@@ -7,10 +7,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.util.retry.Retry;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
+@Slf4j
 @Component
 public class RunnerLifecycle {
 
@@ -33,10 +35,18 @@ public class RunnerLifecycle {
                 .retrieve()
                 .bodyToMono(RegisterResponse.class)
                 .retryWhen(
-                  Retry.backoff(10, Duration.ofSeconds(2))     // try up to 10 times
+                  Retry.backoff(10, Duration.ofSeconds(2)) // try up to 10 times
                   .maxBackoff(Duration.ofSeconds(10))
                 )
-                .doOnNext(resp -> state.setRunnerId(resp.id()))
+                .doOnNext(resp -> {
+                  state.setRunnerId(resp.id()); 
+                  log.info("Runner successfully registered: {}", state.getRunnerId());
+                })
+                .doOnError(e -> log.error(
+                            "Error when calling orchestrator, runnerId={}", 
+                            state.getRunnerId(), 
+                            e
+                ))
                 .block();
     }
 
