@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: jobs-db
+    environment:
+      POSTGRES_DB: jobs
+      POSTGRES_USER: jobs
+      POSTGRES_PASSWORD: jobs
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  orchestrator:
+    build:
+      context: ./orchestrator
+    container_name: orchestrator
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/jobs
+      SPRING_DATASOURCE_USERNAME: jobs
+      SPRING_DATASOURCE_PASSWORD: jobs
+      # Optional tweaks:
+      # SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      # SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+
+  runner:
+    build:
+      context: ./runner
+    depends_on:
+      - orchestrator
+    environment:
+      ORCHESTRATOR_URL: http://orchestrator:8080
+      RUNNER_NAME: runner-1
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+
+volumes:
+  db-data:
+

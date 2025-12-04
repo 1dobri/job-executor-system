@@ -1,0 +1,11 @@
+orchestrator:
+  url: http://orchestrator:8080
+
+runner:
+  name: runner-1
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: runner

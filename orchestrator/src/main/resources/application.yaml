@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: orchestrator
+  jpa: 
+    hibernate:
+      ddl-auto: none
+    show-sql: true
