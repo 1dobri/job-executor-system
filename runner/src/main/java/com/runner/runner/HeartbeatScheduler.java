@@ -4,6 +4,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class HeartbeatScheduler {
 
@@ -18,6 +21,8 @@ public class HeartbeatScheduler {
     @Scheduled(fixedDelay = 5000)
     public void heartbeat() {
         if (!state.isRegistered()) return;
+
+        log.info("Sending heartbeat to orchestrator from runner {}", state.getRunnerId());
 
         client.post()
                 .uri("/runners/" + state.getRunnerId() + "/heartbeat")

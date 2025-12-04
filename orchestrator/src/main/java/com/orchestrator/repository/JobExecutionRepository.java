@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,15 @@ public interface JobExecutionRepository extends JpaRepository<JobExecution, UUID
         """,
         nativeQuery = true)
     Optional<JobExecution> findNextPendingExecutionForUpdate(@Param("now") Instant now);
+
+    @Query(value = """
+        SELECT e.*
+        FROM job_execution e
+        INNER JOIN runner r ON e.runner_id = r.id
+        INNER JOIN job j ON e.job_id = j.id
+        WHERE e.status = 'RUNNING'
+        """,
+    nativeQuery = true
+    )
+    List<JobExecution> findActiveExecutions();
 }

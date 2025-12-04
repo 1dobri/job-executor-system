@@ -11,6 +11,7 @@ import com.orchestrator.repository.RunnerRepository;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,6 +75,10 @@ public class ExecutionService {
         retry.setNextRunAt(Instant.now().plus(backoff(attempt)));
 
         execRepo.save(retry);
+    }
+
+    public List<JobExecution> getActiveExecutions() {
+        return execRepo.findActiveExecutions();
     }
 
     private Duration backoff(int attempt) {
