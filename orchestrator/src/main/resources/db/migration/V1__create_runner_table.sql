@@ -1,0 +1,7 @@
+CREATE TABLE runner (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    last_heartbeat TIMESTAMP,
+    status VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
